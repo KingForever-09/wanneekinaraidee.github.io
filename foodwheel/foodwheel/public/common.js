@@ -38,70 +38,96 @@ async function handleSignup(event) {
 }
 
 // จัดการการเข้าสู่ระบบ
-async function handleLogin(event) {
-  event.preventDefault(); // ป้องกันหน้าเว็บรีเฟรช[cite: 1]
+// REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+const AUTH_API_URL = "https://script.google.com/macros/s/AKfycbx21Ye1liXKlavt46AgsW2WQ8QknrGIK6DEhFMRDDDPDYjuwdLo4ydIx0e1GdqXV-eK/exec";
+
+// --- HANDLER FOR SIGNUP FORM ---
+async function handleSignup(event) {
+  event.preventDefault();
   
-  const identifier = document.getElementById('loginIdentifier').value;
-  const password = document.getElementById('loginPassword').value;
+  const username = document.getElementById('signupUsername').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const errorEl = document.getElementById('signupError');
+
+  errorEl.style.color = "#4f8eea";
+  errorEl.textContent = "กำลังดำเนินการ...";
 
   try {
     const response = await fetch(AUTH_API_URL, {
-      method: 'POST',
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // Avoids CORS preflight issue
       body: JSON.stringify({
-        action: 'login',
+        action: "signup",
+        username: username,
+        email: email,
+        password: password
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
+      errorEl.textContent = "";
+      document.getElementById('signupForm').reset();
+      if (typeof switchAuthTab === 'function') switchAuthTab('login');
+    } else {
+      errorEl.style.color = "red";
+      errorEl.textContent = result.message;
+    }
+  } catch (error) {
+    errorEl.style.color = "red";
+    errorEl.textContent = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
+    console.error("Signup error:", error);
+  }
+  return false;
+}
+
+// --- HANDLER FOR LOGIN FORM ---
+async function handleLogin(event) {
+  event.preventDefault();
+
+  const identifier = document.getElementById('loginIdentifier').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl = document.getElementById('loginError');
+
+  errorEl.style.color = "#4f8eea";
+  errorEl.textContent = "กำลังเข้าสู่ระบบ...";
+
+  try {
+    const response = await fetch(AUTH_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // Avoids CORS preflight issue
+      body: JSON.stringify({
+        action: "login",
         identifier: identifier,
         password: password
       })
     });
 
-    const res = await response.json();
-    if (res.status === 'success') {
-      currentUser = res.user;
-      localStorage.setItem('user', JSON.stringify(currentUser));
-      alert(`ยินดีต้อนรับ ${currentUser.username}`);
-      closeAuthModal(); // ปิดหน้าต่าง[cite: 1]
+    const result = await response.json();
+
+    if (result.success) {
+      // Store logged-in user in browser storage
+      localStorage.setItem("currentUser", JSON.stringify(result.user));
       
-      // อัปเดต UI ของคุณหลังล็อกอินสำเร็จที่นี่
-      if (typeof onAuthChanged === 'function') onAuthChanged(); 
+      errorEl.textContent = "";
+      document.getElementById('loginForm').reset();
+      
+      if (typeof closeAuthModal === 'function') closeAuthModal();
+      if (typeof updateAuthUI === 'function') updateAuthUI(); // Call your existing function to render logged in status
+      if (typeof showToast === 'function') showToast("เข้าสู่ระบบเรียบร้อยแล้ว");
     } else {
-      document.getElementById('loginError').innerText = res.message;
+      errorEl.style.color = "red";
+      errorEl.textContent = result.message;
     }
   } catch (error) {
-    document.getElementById('loginError').innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+    errorEl.style.color = "red";
+    errorEl.textContent = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
+    console.error("Login error:", error);
   }
-}
-
-async function api(path, options = {}) {
-  const res = await fetch('/api' + path, {
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  let data = null;
-  try { data = await res.json(); } catch (_) { /* no body */ }
-  if (!res.ok) {
-    const message = (data && data.error) || 'เกิดข้อผิดพลาด กรุณาลองใหม่';
-    throw new Error(message);
-  }
-  return data;
-}
-
-const FALLBACK_IMAGE = "data:image/svg+xml;utf8," + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#fef0d6"/><text x="50%" y="52%" font-size="70" text-anchor="middle" dominant-baseline="middle">🍽️</text></svg>'
-);
-function pickImg(url) {
-  return (url && url.trim() !== "") ? url : FALLBACK_IMAGE;
-}
-
-/* ---------- TOAST ---------- */
-let toastTimer;
-function showToast(msg) {
-  const el = document.getElementById('toastEl');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add('on');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('on'), 2800);
+  return false;
 }
 
 /* ========================================================
