@@ -2,23 +2,6 @@
    API HELPER (shared by every page)
    ======================================================== */
 // ฟังก์ชันสำหรับเรียก API (สำหรับระบบอาหาร/หมวดหมู่เดิม)
-async function api(path, options = {}) {
-  const res = await fetch(path, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || `เกิดข้อผิดพลาด (${res.status})`);
-  }
-
-  return await res.json();
-}
-
 const AUTH_API_URL = 'https://script.google.com/macros/s/AKfycbx21Ye1liXKlavt46AgsW2WQ8QknrGIK6DEhFMRDDDPDYjuwdLo4ydIx0e1GdqXV-eK/exec';
 
 let currentUser = JSON.parse(localStorage.getItem('user')) || null;
