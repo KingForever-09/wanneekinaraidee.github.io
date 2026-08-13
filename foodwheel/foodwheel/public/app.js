@@ -2,7 +2,6 @@
    HOME PAGE LOGIC — wheel, category browser, editable food list.
    Auth, nav, and shared modals live in common.js (loaded first).
    ======================================================== */
-const GOOGLE_API_URL = 'https://script.google.com/a/macros/skn.ac.th/s/AKfycbx21Ye1liXKlavt46AgsW2WQ8QknrGIK6DEhFMRDDDPDYjuwdLo4ydIx0e1GdqXV-eK/exec';
 let categories = [];         // [{ key, label, emoji, img }]
 let categoryLabels = {};     // key -> "Label emoji"
 let activeCategory = null;
