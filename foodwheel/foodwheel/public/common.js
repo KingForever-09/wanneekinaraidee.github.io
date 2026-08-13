@@ -2,7 +2,7 @@
    API HELPER (shared by every page)
    ======================================================== */
 
-const AUTH_API_URL = 'https://script.google.com/a/macros/skn.ac.th/s/AKfycbx21Ye1liXKlavt46AgsW2WQ8QknrGIK6DEhFMRDDDPDYjuwdLo4ydIx0e1GdqXV-eK/exec';
+const AUTH_API_URL = 'https://script.google.com/macros/s/AKfycbx21Ye1liXKlavt46AgsW2WQ8QknrGIK6DEhFMRDDDPDYjuwdLo4ydIx0e1GdqXV-eK/exec';
 
 let currentUser = JSON.parse(localStorage.getItem('user')) || null;
 
