@@ -1,6 +1,76 @@
 /* ========================================================
    API HELPER (shared by every page)
    ======================================================== */
+
+const AUTH_API_URL = 'https://wanneekinaraidee-github-io.onrender.com/';
+
+let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+
+// จัดการการสมัครสมาชิก
+async function handleSignup(event) {
+  event.preventDefault(); // ป้องกันหน้าเว็บรีเฟรช[cite: 1]
+  
+  const username = document.getElementById('signupUsername').value;
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+
+  try {
+    const response = await fetch(AUTH_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'signup',
+        username: username,
+        email: email,
+        password: password
+      })
+    });
+
+    const res = await response.json();
+    if (res.status === 'success') {
+      alert('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ');
+      switchAuthTab('login'); // กลับไปหน้า Login[cite: 1]
+    } else {
+      document.getElementById('signupError').innerText = res.message;
+    }
+  } catch (error) {
+    document.getElementById('signupError').innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+  }
+}
+
+// จัดการการเข้าสู่ระบบ
+async function handleLogin(event) {
+  event.preventDefault(); // ป้องกันหน้าเว็บรีเฟรช[cite: 1]
+  
+  const identifier = document.getElementById('loginIdentifier').value;
+  const password = document.getElementById('loginPassword').value;
+
+  try {
+    const response = await fetch(AUTH_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'login',
+        identifier: identifier,
+        password: password
+      })
+    });
+
+    const res = await response.json();
+    if (res.status === 'success') {
+      currentUser = res.user;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      alert(`ยินดีต้อนรับ ${currentUser.username}`);
+      closeAuthModal(); // ปิดหน้าต่าง[cite: 1]
+      
+      // อัปเดต UI ของคุณหลังล็อกอินสำเร็จที่นี่
+      if (typeof onAuthChanged === 'function') onAuthChanged(); 
+    } else {
+      document.getElementById('loginError').innerText = res.message;
+    }
+  } catch (error) {
+    document.getElementById('loginError').innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+  }
+}
+
 async function api(path, options = {}) {
   const res = await fetch('/api' + path, {
     credentials: 'include',
