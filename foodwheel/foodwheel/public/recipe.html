@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สูตรอาหาร — วันนี้กินอะไรดีนะ?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-requires-auth="true">
+
+<header>
+  <button class="close-btn" aria-label="close" onclick="showToast('ปิดหน้าต่าง (demo)')">&times;</button>
+  <nav>
+    <a href="/" onclick="goHome(event)">Home</a>
+    <a href="/#about" onclick="goAbout(event)">About</a>
+    <a href="/#contact" onclick="openContact(event)">Contact</a>
+    <a href="/#faqs" onclick="openFaq(event)">FAQs</a>
+    <a href="/favorites.html" id="favNavLink">❤️ Favorites</a>
+  </nav>
+  <div class="auth-buttons" id="authButtons"></div>
+</header>
+
+<section class="page-hero">
+  <a href="javascript:history.back()" class="back-link">← กลับ</a>
+  <div id="recipeContent">
+    <p class="loading-text">กำลังโหลดสูตรอาหาร...</p>
+  </div>
+</section>
+
+<!-- Login / Sign up Modal (only shown if a session expires mid-visit) -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box auth-modal-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLoginBtn" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+      <button class="auth-tab" id="tabSignupBtn" onclick="switchAuthTab('signup')">สมัครสมาชิก</button>
+    </div>
+    <form id="loginForm" class="auth-form" onsubmit="return handleLogin(event)">
+      <input type="text" id="loginIdentifier" placeholder="ชื่อผู้ใช้ หรือ อีเมล" autocomplete="username" required>
+      <input type="password" id="loginPassword" placeholder="รหัสผ่าน" autocomplete="current-password" required>
+      <p class="auth-error" id="loginError"></p>
+      <button type="submit" class="auth-submit-btn">เข้าสู่ระบบ</button>
+    </form>
+    <form id="signupForm" class="auth-form hidden" onsubmit="return handleSignup(event)">
+      <input type="text" id="signupUsername" placeholder="ชื่อผู้ใช้ (3-20 ตัวอักษร)" autocomplete="username" required>
+      <input type="email" id="signupEmail" placeholder="อีเมล" autocomplete="email" required>
+      <input type="password" id="signupPassword" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)" autocomplete="new-password" required>
+      <p class="auth-error" id="signupError"></p>
+      <button type="submit" class="auth-submit-btn">สมัครสมาชิก</button>
+    </form>
+    <button class="cancel-btn auth-close-btn" onclick="closeAuthModal()">ปิด</button>
+  </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal-box contact-modal-box">
+    <h3>ติดต่อเรา</h3>
+    <p class="cm-sub">ติดตามเราหรือส่งข้อเสนอแนะเมนูได้ที่ Social Media ด้านล่าง</p>
+    <div class="social-links">
+      <a class="social-link ig-link" href="https://www.instagram.com/yatsyeyoyo" target="_blank" rel="noopener">
+        <div class="sl-icon">📸</div>
+        <div class="sl-info"><span class="sl-name">Instagram</span><span class="sl-handle">@yatsyeyoyo</span></div>
+      </a>
+      <a class="social-link ig2-link" href="https://www.instagram.com/4catfart" target="_blank" rel="noopener">
+        <div class="sl-icon">📸</div>
+        <div class="sl-info"><span class="sl-name">Instagram</span><span class="sl-handle">@4catfart</span></div>
+      </a>
+      <a class="social-link ig3-link" href="https://www.instagram.com/llptsrtx_" target="_blank" rel="noopener">
+        <div class="sl-icon">📸</div>
+        <div class="sl-info"><span class="sl-name">Instagram</span><span class="sl-handle">@llptsrtx_</span></div>
+      </a>
+    </div>
+    <button class="close-modal-btn" onclick="closeContact()">ปิด</button>
+  </div>
+</div>
+
+<!-- FAQ Modal -->
+<div class="modal-overlay" id="faqModal">
+  <div class="modal-box faq-modal-box">
+    <h3>คำถามที่พบบ่อย (FAQs)</h3>
+    <div class="faq-item">
+      <div class="q">ทำไมบางเมนูไม่มีสูตร?</div>
+      <div class="a">เรากำลังทยอยเพิ่มสูตรอาหารทีละเมนู เมนูไหนยังไม่มีจะขึ้นข้อความแจ้งไว้ให้ทราบ</div>
+    </div>
+    <button class="close-modal-btn" onclick="closeFaq()">ปิด</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-title">👩‍💻 ผู้จัดทำ</div>
+  <div class="creators-grid">
+    <div class="creator-card"><div class="cr-num">เลขที่ 25</div><div class="cr-name">นางสาวญาตานุช เพชรพราว</div><div class="cr-class">ม.5/2</div></div>
+    <div class="creator-card"><div class="cr-num">เลขที่ 26</div><div class="cr-name">นางสาวณัฐนันท์ ไพรวรรณ์</div><div class="cr-class">ม.5/2</div></div>
+    <div class="creator-card"><div class="cr-num">เลขที่ 27</div><div class="cr-name">นางสาวลลิภัทร สัตย์ศรี</div><div class="cr-class">ม.5/2</div></div>
+  </div>
+  <div class="footer-copy">© 2568 วันนี้กินอะไรดีนะ?</div>
+</footer>
+
+<div class="toast" id="toastEl"></div>
+
+<script src="common.js"></script>
+<script src="recipe.js"></script>
+</body>
+</html>
